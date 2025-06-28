@@ -16,10 +16,10 @@
             <p>Cari Berita Pemilu Pada 2024</p>
         </header>
 
-        <form method="POST" class="search-form">
+        <form method="GET" action="/" class="search-form">
 
             <div class="search-bar-container">
-                <input type="text" name="query" placeholder="Enter your query..." value="{{ request.form.query }}" />
+                <input type="text" name="query" placeholder="Enter your query..." value="{{ query }}" />
                 <button type="submit">Search</button>
             </div>
 
@@ -30,96 +30,86 @@
 
                     <div class="filter-group">
                         <h3>Filter by Date</h3>
-                            <label for="date_from">From:</label>
-                            <input type="date" name="date_from" value="{{ date_from }}">
+                        <label for="date_from">From:</label>
+                        <input type="date" name="date_from" value="{{ date_from }}">
 
-                            <label for="date_to">To:</label>
-                            <input type="date" name="date_to" value="{{ date_to }}">
+                        <label for="date_to">To:</label>
+                        <input type="date" name="date_to" value="{{ date_to }}">
                     </div>
 
-                    <!-- <div class="sidebar">
-                        <label>Filter by Tags</label>
-                        <div class="tag-list">
-                            {% for tag in all_tags %}
-                                <div class="tag-item">
-                                    <input type="checkbox" name="tag_filter" value="{{ tag }}" id="tag-{{ loop.index }}" {% if tag in selected_tags %}checked{% endif %}>
-                                    <label for="tag-{{ loop.index }}">{{ tag }} <span>({{ tag_counts[tag] }})</span></label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div> -->
-                    
                     <h3>Filter by Author</h3>
-                        <div class="author-list">
-                        {% for author in author %}
+                    <div class="author-list">
+                        {% for author in authors %}
                             <label>
                                 <input type="checkbox" name="author_filter" value="{{ author }}" {% if author|lower in selected_authors %}checked{% endif %}>
-
-                            {{ author }}
+                                {{ author }}
                             </label><br>
                         {% endfor %}
-                        </div>
+                    </div>
                 </aside>
 
                 <main class="results-content">
-                    {% if request.method == 'POST' %}
-                        {% if results %}
-                            <h3>Found {{ results|length }} results</h3>
-                            {% for res in results %}
-                                <article class="result-card">
-                                    <div class="card-header">
-                                        <a href="{{ res.url }}" target="_blank">
-                                            <h4>{{ res.title }}</h4>
-                                        </a>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="meta-tags"><strong>Tags:</strong> {{ res.tags if res.tags else 'None' }}</p>
-                                        <p class="meta-author"><strong>Author:</strong> {{ res.author if res.author else 'Unknown' }}</p>
-                                    </div>
-                                    <div class="card-footer">
+                    {% if results %}
+                        <h3>Found {{ total_results }} results</h3>
+                        {% for res in results %}
+                            <article class="result-card">
+                                <div class="card-header">
+                                    <a href="{{ res.url }}" target="_blank">
+                                        <h4>{{ res.title }}</h4>
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <p class="meta-tags"><strong>Tags:</strong> {{ res.tags if res.tags else 'None' }}</p>
+                                    <p class="meta-author"><strong>Author:</strong> {{ res.author if res.author else 'Unknown' }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    {% if res.score == 0 %}
+                                        <span class="score no-score">No search score</span>
+                                    {% else %}
                                         <span class="score">Score: {{ res.score }}</span>
-                                        <span class="time">{{ res.date }}</span>
-                                    </div>
-                                </article>
-                            {% endfor %}
-                        {% else %}
-                            <p class="no-results">No results found for your criteria.</p>
-                        {% endif %}
+                                    {% endif %}
+                                    <span class="time">{{ res.date }}</span>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-results">No results found for your criteria.</p>
                     {% endif %}
                 </main>
 
-                
             </div>
+
             <div class="pagination">
-            {% if page > 1 %}
-                <a href="?page={{ page - 1 }}{{ filter_query }}">← Prev</a>
-            {% endif %}
-    
-            {% if page > 3 %}
-                <a href="?page=1{{ filter_query }}">1</a>
-                ...
-            {% endif %}
-    
-            {% for p in range(page - 2, page + 3) %}
-                {% if 1 <= p <= total_pages %}
-                {% if p == page %}
-                    <strong>{{ p }}</strong>
-                {% else %}
-                    <a href="?page={{ p }}{{ filter_query }}">{{ p }}</a>
+                {% if page > 1 %}
+                    <a href="?page={{ page - 1 }}{{ filter_query }}">← Prev</a>
                 {% endif %}
+
+                {% if page > 3 %}
+                    <a href="?page=1{{ filter_query }}">1</a>
+                    ...
                 {% endif %}
-            {% endfor %}
-    
-            {% if page < total_pages - 2 %}
-                ...
-                <a href="?page={{ total_pages }}{{ filter_query }}">{{ total_pages }}</a>
-            {% endif %}
-    
-            {% if page < total_pages %}
-                <a href="?page={{ page + 1 }}{{ filter_query }}">Next →</a>
-            {% endif %}
+
+                {% for p in range(page - 2, page + 3) %}
+                    {% if 1 <= p <= total_pages %}
+                        {% if p == page %}
+                            <strong>{{ p }}</strong>
+                        {% else %}
+                            <a href="?page={{ p }}{{ filter_query }}">{{ p }}</a>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if page < total_pages - 2 %}
+                    ...
+                    <a href="?page={{ total_pages }}{{ filter_query }}">{{ total_pages }}</a>
+                {% endif %}
+
+                {% if page < total_pages %}
+                    <a href="?page={{ page + 1 }}{{ filter_query }}">Next →</a>
+                {% endif %}
             </div>
         </form>
+
 
         </div>
 

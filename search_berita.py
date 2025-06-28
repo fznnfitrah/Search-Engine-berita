@@ -84,75 +84,55 @@ def load_data():
 
 
 
-@app.route('/', methods=['GET', 'POST'])
+from flask import request, render_template
+from math import ceil
+
+@app.route('/', methods=['GET'])
 def index():
-    query = request.form.get('query', '').strip().lower()
-    # query = request.args.get('query', '').strip().lower()
-    # selected_tags = request.form.getlist('tag_filter')
-
-    selected_authors = [a.strip().lower() for a in request.form.getlist('author_filter')]
-    date_from = request.form.get('date_from', '')
-    date_to = request.form.get('date_to', '')
-    # selected_authors = [a.strip().lower() for a in request.args.getlist('author_filter')]
-    # date_from = request.args.get('date_from', '')
-    # date_to = request.args.get('date_to', '')
-
-
-    # selected_tags = [tag.lower() for tag in selected_tags]
-    # selected_authors = [tag.lower() for tag in selected_authors]
-    
-    page = int(request.args.get("page", 1))
-    per_page = 5  # Jumlah hasil per halaman
+    # Ambil semua data dari request.args (karena pakai method=GET)
+    query = request.args.get('query', '').strip().lower()
+    selected_authors = [a.strip().lower() for a in request.args.getlist('author_filter')]
+    date_from = request.args.get('date_from', '')
+    date_to = request.args.get('date_to', '')
+    page = max(1, int(request.args.get("page", 1)))
+    per_page = 10
 
     results = []
 
     if query:
         tokens = [w for w in query.split() if w.lower() not in stop_words]
         scores = bm25.get_scores(tokens)
-
-        # Urutkan berdasarkan skor tertinggi
         ranked = sorted(enumerate(scores), key=lambda x: x[1], reverse=True)
 
         for idx, score in ranked:
-            # tags = doc_tags[idx].lower()
+            author = doc_authors[idx].strip().lower()
+            doc_date = str(doc_times[idx])[:10]
 
-            doc_date = str(doc_times[idx])[:10]  # pastikan YYYY-MM-DD format
-
-            # # Filter berdasarkan tag
-            # if selected_tags and not any(tag in tags for tag in selected_tags):
-            #     continue
-
-            if selected_authors and doc_authors[idx].strip().lower() not in selected_authors:
+            if selected_authors and author not in selected_authors:
                 continue
-
-            # Filter berdasarkan tanggal range
             if date_from and doc_date < date_from:
                 continue
             if date_to and doc_date > date_to:
                 continue
+            if score <= 0:
+                continue
 
             results.append({
                 'title': doc_titles[idx],
-                'tags': doc_tags[idx],
                 'author': doc_authors[idx],
                 'date': doc_times[idx],
                 'score': score,
-                'url': doc_urls[idx]
+                'url': doc_urls[idx],
+                'tags': doc_tags[idx]
             })
 
     else:
-        # Query kosong → hanya filter
         for idx in range(len(doc_titles)):
-            # tags = doc_tags[idx].lower()
-            # year = str(doc_times[idx])[:4]
+            author = doc_authors[idx].strip().lower()
             doc_date = str(doc_times[idx])[:10]
 
-            # if selected_tags and not any(tag in tags for tag in selected_tags):
-            #     continue
-
-            if selected_authors and doc_authors[idx].strip().lower() not in selected_authors:
+            if selected_authors and author not in selected_authors:
                 continue
-
             if date_from and doc_date < date_from:
                 continue
             if date_to and doc_date > date_to:
@@ -160,12 +140,14 @@ def index():
 
             results.append({
                 'title': doc_titles[idx],
-                'tags': doc_tags[idx],
                 'author': doc_authors[idx],
                 'date': doc_times[idx],
                 'score': 0,
-                'url': doc_urls[idx]
+                'url': doc_urls[idx],
+                'tags': doc_tags[idx]
             })
+
+
 
     total_results = len(results)
     total_pages = ceil(total_results / per_page)
@@ -173,28 +155,24 @@ def index():
     end = start + per_page
     paginated_results = results[start:end]
 
+    # Bangun query string untuk pagination links
     filter_query = f"&query={query}&date_from={date_from}&date_to={date_to}"
     for author in selected_authors:
         filter_query += f"&author_filter={author}"
 
-
     return render_template('index.html',
-                            # results=results,
-                            results=paginated_results,
-                            total_results=total_results,
-                            page=page,
-                            total_pages=total_pages,
+                           results=paginated_results,
+                           total_results=total_results,
+                           page=page,
+                           total_pages=total_pages,
+                           selected_authors=selected_authors,
+                           authors=all_author,
+                           available_years=available_years,
+                           date_from=date_from,
+                           date_to=date_to,
+                           query=query,
+                           filter_query=filter_query)
 
-                            selected_authors=selected_authors,
-                            tag_counts=tag_counts,
-                            available_years=available_years,
-
-                            author=all_author,
-                            date_from=date_from,
-                            date_to=date_to,
-
-                            query=query,
-                            filter_query=filter_query)
 
 
 app.add_url_rule('/', 'index', index, methods=['GET', 'POST'])
