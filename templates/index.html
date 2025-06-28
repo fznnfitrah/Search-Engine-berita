@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BM25 Search Engine (Berita Pemilu)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <header class="main-header">
+            <h1>BM25 Search Engine</h1>
+            <p>Cari Berita Pemilu Pada 2024</p>
+        </header>
+
+        <form method="POST" class="search-form">
+
+            <div class="search-bar-container">
+                <input type="text" name="query" placeholder="Enter your query..." value="{{ request.form.query }}" />
+                <button type="submit">Search</button>
+            </div>
+
+            <div class="main-layout">
+
+                <aside class="filters-sidebar">
+                    <h2>Filters</h2>
+
+                    <div class="filter-group">
+                        <h3>Filter by Date</h3>
+                            <label for="date_from">From:</label>
+                            <input type="date" name="date_from" value="{{ date_from }}">
+
+                            <label for="date_to">To:</label>
+                            <input type="date" name="date_to" value="{{ date_to }}">
+                    </div>
+
+                    <div class="sidebar">
+                        <label>Filter by Tags</label>
+                        <div class="tag-list">
+                            {% for tag in all_tags %}
+                                <div class="tag-item">
+                                    <input type="checkbox" name="tag_filter" value="{{ tag }}" id="tag-{{ loop.index }}" {% if tag in selected_tags %}checked{% endif %}>
+                                    <label for="tag-{{ loop.index }}">{{ tag }} <span>({{ tag_counts[tag] }})</span></label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </aside>
+
+                <main class="results-content">
+                    {% if request.method == 'POST' %}
+                        {% if results %}
+                            <h3>Found {{ results|length }} results</h3>
+                            {% for res in results %}
+                                <article class="result-card">
+                                    <div class="card-header">
+                                        <a href="{{ res.url }}" target="_blank">
+                                            <h4>{{ res.title }}</h4>
+                                        </a>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="meta-tags"><strong>Tags:</strong> {{ res.tags if res.tags else 'None' }}</p>
+                                        <p class="meta-author"><strong>Author:</strong> {{ res.author if res.author else 'Unknown' }}</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="score">Score: {{ res.score }}</span>
+                                        <span class="time">{{ res.date }}</span>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        {% else %}
+                            <p class="no-results">No results found for your criteria.</p>
+                        {% endif %}
+                    {% endif %}
+                </main>
+
+            </div>
+        </form>
+        </div>
+
+</body>
+</html>

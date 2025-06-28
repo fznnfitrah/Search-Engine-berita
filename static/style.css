@@ -1,0 +1,246 @@
+/* 1. Reset & Global Styles */
+/* ------------------------- */
+
+/* Menggunakan font Inter dari Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* Mendefinisikan palet warna untuk konsistensi */
+:root {
+    --primary-color: #007bff;
+    --primary-hover-color: #0056b3;
+    --background-color: #f4f7f9;
+    --container-background: #ffffff;
+    --text-color: #333;
+    --text-muted-color: #6c757d;
+    --border-color: #dee2e6;
+    --success-color: #28a745;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Reset dasar untuk semua elemen */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* 2. Header & Search Bar */
+/* ----------------------- */
+
+.main-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.main-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.main-header p {
+    font-size: 1.1rem;
+    color: var(--text-muted-color);
+}
+
+.search-bar-container {
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.search-bar-container input[type="text"] {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px 0 0 8px; /* Sudut kiri melengkung */
+    transition: border-color 0.2s;
+}
+
+.search-bar-container input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.search-bar-container button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0; /* Sudut kanan melengkung */
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-bar-container button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+
+/* 3. Main Layout (Sidebar & Results) */
+/* ------------------------------------ */
+
+.main-layout {
+    display: flex;
+    gap: 2rem; /* Jarak antara sidebar dan konten hasil */
+    align-items: flex-start; /* Konten atas sejajar */
+}
+
+/* 4. Filters Sidebar */
+/* -------------------- */
+
+.filters-sidebar {
+    flex: 1 0 300px; /* Lebar fleksibel, dasar 300px, tidak menyusut */
+    background-color: var(--container-background);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.filters-sidebar h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.75rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group > label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.tag-list {
+    max-height: 400px; /* PENTING: Membuat daftar tag bisa di-scroll */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    border-radius: 4px;
+}
+
+.tag-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.tag-item input[type="checkbox"] {
+    margin-right: 0.5rem;
+    width: 16px;
+    height: 16px;
+}
+
+.tag-item label {
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.tag-item label span {
+    color: var(--text-muted-color);
+}
+
+/* 5. Results Content & Cards */
+/* ---------------------------- */
+
+.results-content {
+    flex: 3 1 0; /* Mengambil sisa ruang yang tersedia */
+}
+
+.results-content h3 {
+    font-size: 1.25rem;
+    color: var(--text-muted-color);
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.result-card {
+    background-color: var(--container-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.result-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.result-card a {
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.card-header h4 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.card-body {
+    margin-bottom: 1rem;
+}
+
+.card-body p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted-color);
+}
+.card-body p strong {
+    color: var(--text-color);
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.card-footer .score {
+    font-weight: 700;
+    color: var(--success-color);
+}
+
+.card-footer .time {
+    color: var(--text-muted-color);
+}
+
+.no-results {
+    background-color: var(--container-background);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    color: var(--text-muted-color);
+}
