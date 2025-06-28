@@ -37,7 +37,7 @@
                             <input type="date" name="date_to" value="{{ date_to }}">
                     </div>
 
-                    <div class="sidebar">
+                    <!-- <div class="sidebar">
                         <label>Filter by Tags</label>
                         <div class="tag-list">
                             {% for tag in all_tags %}
@@ -47,7 +47,18 @@
                                 </div>
                             {% endfor %}
                         </div>
-                    </div>
+                    </div> -->
+                    
+                    <h3>Filter by Author</h3>
+                        <div class="author-list">
+                        {% for author in author %}
+                            <label>
+                                <input type="checkbox" name="author_filter" value="{{ author }}" {% if author|lower in selected_authors %}checked{% endif %}>
+
+                            {{ author }}
+                            </label><br>
+                        {% endfor %}
+                        </div>
                 </aside>
 
                 <main class="results-content">
@@ -77,8 +88,39 @@
                     {% endif %}
                 </main>
 
+                
+            </div>
+            <div class="pagination">
+            {% if page > 1 %}
+                <a href="?page={{ page - 1 }}{{ filter_query }}">← Prev</a>
+            {% endif %}
+    
+            {% if page > 3 %}
+                <a href="?page=1{{ filter_query }}">1</a>
+                ...
+            {% endif %}
+    
+            {% for p in range(page - 2, page + 3) %}
+                {% if 1 <= p <= total_pages %}
+                {% if p == page %}
+                    <strong>{{ p }}</strong>
+                {% else %}
+                    <a href="?page={{ p }}{{ filter_query }}">{{ p }}</a>
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+    
+            {% if page < total_pages - 2 %}
+                ...
+                <a href="?page={{ total_pages }}{{ filter_query }}">{{ total_pages }}</a>
+            {% endif %}
+    
+            {% if page < total_pages %}
+                <a href="?page={{ page + 1 }}{{ filter_query }}">Next →</a>
+            {% endif %}
             </div>
         </form>
+
         </div>
 
 </body>
