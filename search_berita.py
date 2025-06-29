@@ -42,19 +42,22 @@ def load_data():
     doc_ids = df.index.astype(str).tolist()
     doc_titles = df['title'].tolist()
     doc_urls = df['url'].tolist()
-    doc_authors = df['author'].tolist()
+    doc_authors = [a if pd.notna(a) else '' for a in df['author'].tolist()]
     doc_times = df['publish_date'].dt.strftime('%Y-%m-%d').tolist()
 
     df['year'] = df['publish_date'].dt.year
     doc_years = df['year'].tolist()
-    available_years = sorted(df['year'].dropna().unique().astype(int), reverse=True)
 
 
     tokenized_docs = []
     for title, text in zip(df['title'], df['article_text']):
-        words = (str(title) + " " + str(text)).split()
+        if pd.isna(title) and pd.isna(text):
+            continue  
+        combined = f"{str(title)} {str(text)}"
+        words = combined.split()
         filtered = [w for w in words if w.lower() not in stop_words]
-        tokenized_docs.append(filtered)
+        if filtered:  
+            tokenized_docs.append(filtered)
 
     bm25 = BM25Okapi(tokenized_docs)
 
@@ -78,7 +81,6 @@ def load_data():
     doc_tags = cleaned_doc_tags
     all_tags = sorted(fully_cleaned_tags)
     tag_counts = dict(tag_counter)
-    # all_author = [re.sub(r"[\"'`’‘”“\[\]]", "", author) for author in doc_authors]
     all_author = sorted(set(author.strip() for author in doc_authors if pd.notna(author)))
     available_years = sorted(df['year'].dropna().unique().astype(int), reverse=True)
 
@@ -146,7 +148,6 @@ def index():
                 'url': doc_urls[idx],
                 'tags': doc_tags[idx]
             })
-
 
 
     total_results = len(results)
